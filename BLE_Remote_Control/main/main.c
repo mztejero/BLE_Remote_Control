@@ -1,9 +1,10 @@
-// idf.py -p /dev/cu.usbserial-0001 -b 115200 flash monitor
+// idf.py -p /dev/cu.usbserial-1410 -b 115200 flash monitor
 #include "config.h"
 #include "encoder.h"
 #include "joystick.h"
 #include "buttons.h"
 #include "bluetooth.h"
+#include "lcd.h"
 
 void app_main(void) {
     enc_table();
@@ -13,6 +14,10 @@ void app_main(void) {
     setup_isr();
     initialize_joystick(&js_l, &js_r, &params);
     ble_main_init();
+    setup_i2c();
+    lcd_init();
+    lcd_clear();
+    lcd_task();
     while (1) {
         read_joystick(&js_l, &js_r, &params);
         printf("JS vxl: %d, vyl: %d, vxr: %d, vyr: %d | Enc L: %d, R: %d\n",

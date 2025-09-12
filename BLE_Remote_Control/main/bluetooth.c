@@ -15,7 +15,6 @@
 #include "console/console.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
-// #include "bleprph.h"
 #include <string.h>
 
 static const char *ERROR_TAG = "ERRROR_TAG";
@@ -23,6 +22,8 @@ static const char *GAP_TAG = "GAP";
 static const char *GATT_TAG = "GATT";
 
 static const char *device_name = "RC";
+
+static portMUX_TYPE my_spinlock = portMUX_INITIALIZER_UNLOCKED;
 
 static uint16_t current_conn_handle = BLE_HS_CONN_HANDLE_NONE;
 uint16_t rc_val_handle;
@@ -45,37 +46,21 @@ static const ble_uuid128_t rc_char_uuid =
 struct ble_gap_adv_params adv_params;
 struct ble_hs_adv_fields adv_fields;
 
-// struct ble_gap_adv_params adv_params = {
-//     .conn_mode = BLE_GAP_CONN_MODE_UND,
-//     .disc_mode = BLE_GAP_DISC_MODE_GEN,
-//     .itvl_min = 0x00A0,
-//     .itvl_max = 0x00B0,
-//     .channel_map = BLE_GAP_ADV_DFLT_CHANNEL_MAP,
-//     .filter_policy = 0,
-//     .high_duty_cycle = 0
-// };
-
 void notify_remote_control_data(uint16_t conn_handle) {
 
-    // int16_t vxl = (int16_t)js.vxl;
-    // int16_t vyl = (int16_t)js.vyl;
-    // int16_t vxr = (int16_t)js.vxr;
-    // int16_t vyr = (int16_t)js.vyr;
-
+    taskENTER_CRITICAL(&my_spinlock);
     int16_t cl = count_l / 4;
     int16_t cr = count_r / 4;
+    taskEXIT_CRITICAL(&my_spinlock);
 
     uint8_t buf[12];
 
-    // Pack joystick + encoder data
     memcpy(&buf[0], &js.vxl, 2);
     memcpy(&buf[2], &js.vyl, 2);
     memcpy(&buf[4], &js.vxr, 2);
     memcpy(&buf[6], &js.vyr, 2);
     memcpy(&buf[8], &cl, sizeof(cl));
     memcpy(&buf[10], &cr, sizeof(cr));
-
-    // printf("JS vxl: %d, vyl: %d, vxr: %d, vyr: %d | Enc L: %d, R: %d\n", js.vxl, js.vyl, js.vxr, js.vyr, count_l, count_r);
 
     // NimBLE notify
     struct os_mbuf *om = ble_hs_mbuf_from_flat(buf, sizeof(buf));
@@ -111,7 +96,6 @@ int gap_event_handler(struct ble_gap_event *event, void *arg) {
         case BLE_GAP_EVENT_DISCONNECT:
             ESP_LOGI(GAP_TAG, "Client disconnected; restarting advertising");
             esp_restart();
-            // ESP_ERROR_CHECK(ble_gap_adv_start(BLE_OWN_ADDR_PUBLIC, NULL, BLE_HS_FOREVER, &adv_params, gap_event_handler, NULL));
             return 0;
 
         case BLE_GAP_EVENT_ADV_COMPLETE:
@@ -235,7 +219,7 @@ void adv_on_sync(void) {
 
 void ble_host_task(void *param)
 {
-     nimble_port_run(); //This function will return only when nimble_port_stop() is executed.
+     nimble_port_run();
      nimble_port_freertos_deinit();
 }
 
@@ -251,7 +235,6 @@ void ble_main_init(void) {
     ble_hs_cfg.reset_cb = adv_on_reset;
     ble_hs_cfg.sync_cb = adv_on_sync;
     ble_hs_cfg.gatts_register_cb = ble_gatt_register;
-    // ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
 
     ESP_ERROR_CHECK(gatt_svr_init());
     nimble_port_freertos_init(ble_host_task);

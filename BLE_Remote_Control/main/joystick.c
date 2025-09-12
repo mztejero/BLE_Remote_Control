@@ -12,6 +12,7 @@
 
 // Define Handles
 adc_oneshot_unit_handle_t adc1_handle;
+adc_oneshot_unit_handle_t adc2_handle;
 
 // Structs
 typedef struct {
@@ -51,10 +52,15 @@ JoystickVals js = {
 
 // ADC Setup
 void setup_adc(void) {
-    adc_oneshot_unit_init_cfg_t init_cfg = {
+    adc_oneshot_unit_init_cfg_t init_cfg_adc1 = {
         .unit_id = ADC_UNIT_1
     };
-    adc_oneshot_new_unit(&init_cfg, &adc1_handle);
+    adc_oneshot_new_unit(&init_cfg_adc1, &adc1_handle);
+
+    adc_oneshot_unit_init_cfg_t init_cfg_adc2 = {
+        .unit_id = ADC_UNIT_2
+    };
+    adc_oneshot_new_unit(&init_cfg_adc2, &adc2_handle);
 
     adc_oneshot_chan_cfg_t chan_cfg = {
         .bitwidth = ADC_BITWIDTH_DEFAULT,
@@ -64,8 +70,8 @@ void setup_adc(void) {
     adc_oneshot_config_channel(adc1_handle, pins.vx_l, &chan_cfg);
     adc_oneshot_config_channel(adc1_handle, pins.vy_l, &chan_cfg);
 
-    adc_oneshot_config_channel(adc1_handle, pins.vx_r, &chan_cfg);
-    adc_oneshot_config_channel(adc1_handle, pins.vy_r, &chan_cfg);
+    adc_oneshot_config_channel(adc2_handle, pins.vx_r, &chan_cfg);
+    adc_oneshot_config_channel(adc2_handle, pins.vy_r, &chan_cfg);
 }
 
 // Initialize Joystick
@@ -81,9 +87,9 @@ void initialize_joystick(Joystick *js_l, Joystick *js_r, Parameters *params) {
         vxl_sum += sample;
         adc_oneshot_read(adc1_handle, pins.vy_l, &sample);
         vyl_sum += sample;
-        adc_oneshot_read(adc1_handle, pins.vx_r, &sample);
+        adc_oneshot_read(adc2_handle, pins.vx_r, &sample);
         vxr_sum += sample;
-        adc_oneshot_read(adc1_handle, pins.vy_r, &sample);
+        adc_oneshot_read(adc2_handle, pins.vy_r, &sample);
         vyr_sum += sample;
 
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -110,8 +116,8 @@ void read_joystick(Joystick *js_l, Joystick *js_r, Parameters *params) {
     
     adc_oneshot_read(adc1_handle, pins.vx_l, &vxl_raw);
     adc_oneshot_read(adc1_handle, pins.vy_l, &vyl_raw);
-    adc_oneshot_read(adc1_handle, pins.vx_r, &vxr_raw);
-    adc_oneshot_read(adc1_handle, pins.vy_r, &vyr_raw);
+    adc_oneshot_read(adc2_handle, pins.vx_r, &vxr_raw);
+    adc_oneshot_read(adc2_handle, pins.vy_r, &vyr_raw);
 
     int delta_vxl = (vxl_raw - js_l->vx_offset);
     int delta_vyl = (vyl_raw - js_l->vy_offset);
@@ -151,6 +157,4 @@ void read_joystick(Joystick *js_l, Joystick *js_r, Parameters *params) {
         js.vyr = 100 * delta_vyr / js_r->vy_range;
         js.vyr = MAX(-100, MIN(100, js.vyr));
     }
-
-    // printf("Left Joystick: vx=%ld vy=%ld | Right Joystick: vx=%ld vy=%ld\n", js.vxl, js.vyl, js.vxr, js.vyr);
 }

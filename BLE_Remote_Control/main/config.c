@@ -13,10 +13,10 @@ const PinConfig pins = {
     .sw_enc_r = GPIO_NUM_4,
     .vx_l = ADC_CHANNEL_6,
     .vy_l = ADC_CHANNEL_7,
-    .sw_js_l = GPIO_NUM_25,
-    .vx_r = ADC_CHANNEL_4,
-    .vy_r = ADC_CHANNEL_5,
-    .sw_js_r = GPIO_NUM_26
+    .sw_js_l = GPIO_NUM_32,
+    .vx_r = ADC_CHANNEL_8,
+    .vy_r = ADC_CHANNEL_9,
+    .sw_js_r = GPIO_NUM_33
 };
 
 // GPIO Setup

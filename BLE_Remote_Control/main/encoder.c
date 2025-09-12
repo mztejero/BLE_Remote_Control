@@ -5,8 +5,8 @@
 #include "freertos/task.h"
 
 // Global Variables
-volatile int count_l;
-volatile int count_r;
+volatile int count_l = 1500 * 4;
+volatile int count_r = 1500 * 4;
 
 // Define Handles
 QueueHandle_t queue_l;
@@ -68,10 +68,6 @@ void left_isr_task(void *arg) {
     uint8_t state;
     while (1) {
         if (xQueueReceive(queue_l, &state, portMAX_DELAY) == pdTRUE) {
-            // printf("state left: 0b");
-            // print_u8_bin(state);
-            // printf("\n");
-            // printf("enc[state]: %d\n", enc[state & 0x0F]);
             count_l += enc[state & 0x0F];
         }
     }
@@ -81,10 +77,6 @@ void right_isr_task(void *arg) {
     uint8_t state;
     while (1) {
         if (xQueueReceive(queue_r, &state, portMAX_DELAY) == pdTRUE) {
-            // printf("state right: 0b");
-            // print_u8_bin(state);
-            // printf("\n");
-            // printf("enc[state]: %d\n", enc[state & 0x0F]);
             count_r += enc[state & 0x0F];
         }
     }
