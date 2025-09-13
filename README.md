@@ -39,8 +39,9 @@ main.c
 This PCB is designed using the following components:
 
 ## SMD Components
-ESP32-WROOM-32E -- Microcontroller used to run firmware, read sensors, write to actuators, and handle BLE communication.
-CP2102A USB-to-UART -- Interface for uploading code to the ESP32-WROOM-32E. The NPN transistors circuitry automatically put the ESP32 into bootloader mode when a new upload happens. <br>
+ESP32-WROOM-32E -- Microcontroller used to run firmware, read sensors, write to actuators, and handle BLE communication. <br>
+CP2102A USB-to-UART -- Interface for uploading code to the ESP32-WROOM-32E. The NPN transistors circuitry automatically put the ESP32 into bootloader mode when a new upload happens.<br>
+<br>
 PCF8574A I2C I/O for LCD communication -- Uses SCL and SDA to convert I<sup>2</sup>C data into bits to send to the LCD 16x02. Circuitry implements n-type MOSFETs for level shifting between 5V and 3V3 <br>
 AMS1117-3.3 -- Converts 5V into 3.3V for components requiring 3V3<br>
 
