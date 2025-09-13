@@ -38,19 +38,19 @@ main.c
 
 This PCB is designed using the following components:
 
-##SMD Components
+## SMD Components
 ESP32-WROOM-32E -- Microcontroller used to run firmware, read sensors, write to actuators, and handle BLE communication.
 CP2102A USB-to-UART -- Interface for uploading code to the ESP32-WROOM-32E. The NPN transistors circuitry automatically put the ESP32 into bootloader mode when a new upload happens. <br>
 PCF8574A I2C I/O for LCD communication -- Uses SCL and SDA to convert I<sup>2</sup>C data into bits to send to the LCD 16x02. Circuitry implements n-type MOSFETs for level shifting between 5V and 3V3 <br>
 AMS1117-3.3 -- Converts 5V into 3.3V for components requiring 3V3<br>
 
-##Hand-Soldered Components
+## Hand-Soldered Components
 Rotary Encoders -- Quadrature encoders with A and B terminals connected to GPIOs with pull-ups. Interrupts on these pull-ups are triggered upon rotation. <br>
 Joysticks -- Use 2 potentiometers, one for x direction and one for y direction. These values are read through the ESP32's ADC. <br>
 LCD 16x02 -- Displays characters on a 16×2 grid from data bits. <br>
 Potentiometer -- Adjusts LCD lighting. <br>
 
-#Final PCB Design
+# Final PCB Design
 <p align="center">
 <img src="pcb_files/plots/RC_pcb.png" alt="Plot" width="700"/>
 </p>
